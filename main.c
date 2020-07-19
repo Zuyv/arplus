@@ -84,7 +84,7 @@ void release_stream(FILE *stream)
 
 void print_version()
 {
-	fprintf(stdout, "arplus v%s", VERSION);
+	fprintf(stdout, "arplus v%s\n", VERSION);
 }
 
 void print_help(const char *procname, bool full)
