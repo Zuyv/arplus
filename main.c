@@ -13,6 +13,7 @@
 #include <linux/if_ether.h>
 #include <linux/if_arp.h>
 
+#define VERSION		"2.0"
 #define IP4_ALEN	4
 #define ARRAY_SIZE(x)	(sizeof(x)/sizeof(x[0]))
 
@@ -58,6 +59,7 @@ const char *short_args = "o:hv";
 const struct option long_args[] = {
 	{"output", required_argument, NULL, 'o'},
 	{"help", no_argument, NULL, 'h'},
+	{"version", no_argument, NULL, 'v'},
 };
 
 int get_stream(FILE **stream)
@@ -80,7 +82,12 @@ void release_stream(FILE *stream)
 		fclose(stream);
 }
 
-void log_help(const char *procname, bool full)
+void print_version()
+{
+	fprintf(stdout, "arplus v%s", VERSION);
+}
+
+void print_help(const char *procname, bool full)
 {
 	FILE *stream = args.help ? stdout : stderr;
 
@@ -236,7 +243,7 @@ int main(int argc, char *argv[])
 
 	ret = get_args(argc, argv);
 	if (ret == -1 || args.help) {
-		log_help(procname, args.help);
+		print_help(procname, args.help);
 		return !!ret;
 	}
 
