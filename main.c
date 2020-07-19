@@ -13,7 +13,7 @@
 #include <linux/if_ether.h>
 #include <linux/if_arp.h>
 
-#define VERSION		"2.0"
+#define VERSION		"0.2.0"
 #define IP4_ALEN	4
 #define ARRAY_SIZE(x)	(sizeof(x)/sizeof(x[0]))
 
@@ -49,17 +49,21 @@ struct options {
 	char *ifname;
 	char *output;
 	bool help;
+	bool version;
 } args = {
 	.ifname = NULL,
 	.output = NULL,
-	.help = false
+	.help = false,
+	.version = false
 };
 
 const char *short_args = "o:hv";
 const struct option long_args[] = {
-	{"output", required_argument, NULL, 'o'},
-	{"help", no_argument, NULL, 'h'},
-	{"version", no_argument, NULL, 'v'},
+	{"output",	required_argument,	NULL,	'o'},
+	{"help",	no_argument,		NULL,	'h'},
+	{"version",	no_argument,		NULL,	'v'},
+	/* GETOPT(3)：The last element of the array has to be filled with zeros. */
+	{0,		0,			0,	0},
 };
 
 int get_stream(FILE **stream)
@@ -170,9 +174,8 @@ int log_error(const char *prefix)
 int get_args(int argc, char *argv[])
 {
 	int optch;
-	int optid;
 
-	while ((optch = getopt_long(argc, argv, short_args, long_args, &optid)) != -1) {
+	while ((optch = getopt_long(argc, argv, short_args, long_args, NULL)) != -1) {
 		switch (optch)
 		{
 		case 'o':
@@ -180,6 +183,9 @@ int get_args(int argc, char *argv[])
 			break;
 		case 'h':
 			args.help = true;
+			break;
+		case 'v':
+			args.version = true;
 			break;
 		case '?':
 			return -1;
@@ -242,10 +248,17 @@ int main(int argc, char *argv[])
 	arphdr_t *arp = (arphdr_t *)(eth + 1);
 
 	ret = get_args(argc, argv);
-	if (ret == -1 || args.help) {
-		print_help(procname, args.help);
-		return !!ret;
+	if (ret == -1) {
+		print_help(procname, 0);
+		return 1;
 	}
+
+	if (args.version)
+		print_version();
+	if (args.help)
+		print_help(procname, 1);
+	if (args.version || args.help)
+		return 0;
 
 	log_welcome();
 
