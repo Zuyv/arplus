@@ -96,7 +96,7 @@ void print_help(const char *procname, bool full)
 	FILE *stream = args.help ? stdout : stderr;
 
 	fprintf(stream,
-		"Usage: %s <ifname> [options]\n"
+		"Usage: %s <ifname> [-o|--output <logfile>]\n"
 		"       %s [-h|--help] [-v|--version]\n", procname, procname);
 
 	if (full) {
@@ -104,9 +104,9 @@ void print_help(const char *procname, bool full)
 			"\n"
 			"Listen on specified interface and reply ARP requests as desired.\n"
 			"\n"
-			"  -o, --output   <filename>  output the report to this specified file\n"
-			"  -h, --help                 print this message and quit\n"
-			"  -v, --version              print version information and quit\n");
+			"  -o, --output FILE    output the report to FILE\n"
+			"  -h, --help           print this message and quit\n"
+			"  -v, --version        print version information and quit\n");
 	}
 }
 
@@ -192,7 +192,7 @@ int get_args(int argc, char *argv[])
 		}
 	}
 
-	if (optind != argc - 1)
+	if (!args.help && !args.version && optind != argc - 1)
 		return -1;
 
 	args.ifname = argv[optind++];
